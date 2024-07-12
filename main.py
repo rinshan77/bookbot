@@ -14,12 +14,12 @@ def count_chars(book):
     dictionary = {}
     for i in "abcdefghijklmnopqrstuvwxyz":
         dictionary[i] = 0
-        for letter in lowercase_book:
-            if letter in dictionary:
-                dictionary[letter] += 1
+    for letter in lowercase_book:
+        if letter in dictionary:
+            dictionary[letter] += 1
     return dictionary   
 
-def print_char_counts_table(char_counts, columns=10):
+def print_char_count_table(char_counts, columns=10):
     items = list(char_counts.items())
     print("The amount of each letter appearing in the book is:")
     for i in range(0, len(items), columns):
@@ -31,5 +31,9 @@ if __name__ == "__main__":
         book = read_file("books/frankenstein.txt")
 
     #print(book)
-    count_words(book)
-    print_char_counts_table(count_chars(book))
+    #count_words(book)
+    print(count_chars(book))
+    #print_char_counts_table(count_chars(book))
+
+#def main():
+    
