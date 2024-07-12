@@ -7,7 +7,6 @@ def count_words(book):
         count = 0
         for word in words:
             count += 1
-        print(f"The number of words in this document are {count}.")
         return count
 
 def count_chars(book):
@@ -29,8 +28,8 @@ def print_char_count_table(char_counts, columns=10):
 def count_get(item):
     return item[1]
 
-def sort_dictionary(char_counts):
-    char_tuple = char_counts.items()
+def sort_dictionary(char_count):
+    char_tuple = char_count.items()
     char_list = list(char_tuple)
     sorted_char_list = sorted(char_list, key=count_get, reverse=True)
     return sorted_char_list
@@ -41,6 +40,7 @@ def main(book):
     char_count = count_chars(book)
     sorted_chars = sort_dictionary(char_count)
     print(f"{word_count} words found in the document")
+    print()
     for char, count in sorted_chars:
         print(f"The '{char}' character was found {count} times")
     print("--- End report ---")
