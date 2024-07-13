@@ -44,8 +44,21 @@ def sort_dictionary(char_count):
     sorted_char_list = sorted(char_list, key=count_get, reverse=True)
     return sorted_char_list
 
+def word_count(book):
+    lowercase_book = book.lower()
+    words = lowercase_book.split()
+    word_count = {}
+    for word in words:
+        if word in word_count:
+            word_count[word] += 1
+        else:
+            word_count[word] = 1
+    return word_count
+
+
+
 def main(book):
-    print("--- Begin report of books/frankenstein.txt ---")  
+    print(f"--- Begin report of the entered document ---")  
     word_count = count_words(book)
     char_count = count_chars(book)
     sorted_chars = sort_dictionary(char_count)
