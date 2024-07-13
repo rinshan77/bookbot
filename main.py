@@ -29,10 +29,17 @@ def count_chars(book):
             dictionary[letter] += 1
     return dictionary   
 
-def print_char_count_table(sorted_chars, columns=10):
-    for i in range(0, len(sorted_chars), columns):
-        row_items = sorted_chars[i:i+columns]
-        print(' '.join([f"{char}: {count:5}" for char, count in row_items]))
+def print_count_table(sorted_items, columns=10, item_type='letters'):
+    if item_type == 'letters':
+        for i in range(0, len(sorted_items), columns):
+            row_items = sorted_items[i:i+columns]
+            print(' | '.join([f"{item}: {count:5}" for item, count in row_items]))
+    elif item_type == 'words':
+        for i in range(0, len(sorted_items), columns):
+            row_items = sorted_items[i:i+columns]
+            print(' | '.join([f"{item}: {count}" for item, count in row_items]))
+
+
 
 def count_get(item):
     return item[1]
@@ -44,10 +51,16 @@ def sort_dictionary(char_count):
     return sorted_char_list
 
 def word_count(book):
+    punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
     lowercase_book = book.lower()
+    clean_words = []
     words = lowercase_book.split()
     word_count = {}
     for word in words:
+        clean_word = ''.join(char for char in word if char not in punctuation)
+        if clean_word:
+            clean_words.append(clean_word)
+    for word in clean_words:
         if word in word_count:
             word_count[word] += 1
         else:
@@ -55,10 +68,11 @@ def word_count(book):
     return word_count
 
 def sort_words(word_count, start=0, end=None):
-    sorted_words = sorted(word_count.items(), key=count_get, reverse=True)
+    sorted_words = sorted(word_count.items(), key=lambda item: item[1], reverse=True)
+    if end is None or end > len(sorted_words):
+        end = len(sorted_words)
     selected_words = sorted_words[start:end]
-    for word, count in selected_words:
-        print(f"The word '{word}' appears {count} times")
+    print_count_table(selected_words, item_type='words')
 
 def count_specific_word(book, word):
     word = word.lower()
@@ -77,7 +91,7 @@ def main(book):
         print("1) Print the entire document on screen.")
         print("2) Count how many times each letter of the alphabet appears in the document.")
         print("3) List how many times every single word in the document appears.")
-        print("4) List the most common words from place a to b.")
+        print("4) List the most common words from rank 'a' to rank 'b'.")
         print("5) Count how many times a given word appears in the document.")
         print("6) Exit")
         choice = input("Please enter your choice:")
@@ -87,7 +101,7 @@ def main(book):
         elif choice == '2':
             char_count = count_chars(book)
             sorted_chars = sort_dictionary(char_count)
-            print_char_count_table(sorted_chars)
+            print_count_table(sorted_chars)
         elif choice == '3':
             words_count = word_count(book)
             sort_words(words_count)
