@@ -55,7 +55,22 @@ def word_count(book):
             word_count[word] = 1
     return word_count
 
+def sort_words(word_count, start=0, end=20):
+    sorted_words = sorted(word_count.items(), key=count_get, reverse=True)
+    selected_words = sorted_words[start:end]
+    for word, count in selected_words:
+        print(f"The word '{word}' appears {count} times")
 
+def count_specific_word(book, word):
+    word = word.lower()
+    words= book.lower().split()
+    count = 0
+    for w in words:
+        if w == word:
+            count += 1
+    print(f"The word '{word}' appears {count} times.")
+
+    
 
 def main(book):
     print(f"--- Begin report of the entered document ---")  
@@ -68,6 +83,7 @@ def main(book):
         print(f"The '{char}' character was found {count} times")
     print("--- End report ---")
 
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         filepath = sys.argv[1]
@@ -75,6 +91,6 @@ if __name__ == "__main__":
         filepath = input("Please enter the path to the text file: ")
     book = read_file(filepath)
     if book:
-        main(book)
+        print(sort_words(word_count(book)))
     else:
         print("Failed to read file. Please check the file path and try again.")
