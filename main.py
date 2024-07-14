@@ -3,7 +3,7 @@ import sys
 
 def read_file(filepath):
     try:
-        with open(filepath, "r") as path:
+        with open(filepath, "r", encoding="utf-8") as path:
             return path.read()
     except FileNotFoundError:
         print(f"Error: The file '{filepath}' was not found.")
@@ -14,11 +14,7 @@ def read_file(filepath):
 
 
 def count_words(book):
-    words = book.split()
-    count = 0
-    for word in words:
-        count += 1
-    return count
+    return len(book.split())
 
 
 def count_chars(book):
@@ -98,6 +94,76 @@ def count_specific_word(book, word):
     print(f"The word '{word}' appears {count} times.")
 
 
+def replace_word(book):
+    while True:
+        words = input(
+            "Please enter the word you wish replaced in the document followed by the word you want it replaced with. \n"
+            "Enter one word only to remove the word from the document: "
+        ).split()
+        if len(words) == 1:
+            removal_word = words[0]
+            if removal_word.lower() == "quit":
+                print("Exiting replace word operation.")
+                return book
+
+            if removal_word.lower() in book.lower():
+                new_document = book.replace(removal_word, "")
+                print(f"'{removal_word}' removed from the document.")
+                print("\n --- Start of the modified document --- \n")
+                print(new_document)
+                print("\n --- End of the modified document --- \n")
+                save_file(new_document)
+                return new_document
+            else:
+                print(
+                    f"'{removal_word}' was not found in the document. Try again or type 'quit' to exit."
+                )
+                continue
+
+        elif len(words) == 2:
+            replace_word = words[0]
+            with_word = words[1]
+            if replace_word.lower() in book.lower():
+                new_document = book.replace(replace_word, with_word)
+                print(f"Replaced '{replace_word}' with '{with_word}' in the document.")
+                print("\n --- Start of the modified document --- \n")
+                print(new_document)
+                print("\n --- End of the modified document --- \n")
+                save_file(new_document)
+                return new_document
+            else:
+                print(
+                    f"'{replace_word}' was not found in the document. Try again or type 'quit' to exit."
+                )
+                continue
+
+        else:
+            print(
+                "Invalid input. Please enter one or two words. Try again or type 'quit' to exit."
+            )
+            continue
+
+
+def save_file(modified_book):
+    save = (
+        input("Would you like to save the modified document? (yes/no): ")
+        .strip()
+        .lower()
+    )
+    if save == "yes":
+        path = input(
+            "Enter the path and filename to save the document (e.g. /path/to/document.txt): "
+        ).strip()
+        try:
+            with open(path, "w", encoding="utf-8") as file:
+                file.write(modified_book)
+            print(f"Document successfully saved to {path}!")
+        except IOError as e:
+            print(f"An error occurred while saving the document: {e}")
+    else:
+        print("The modified document was not saved.")
+
+
 def main(book):
     while True:
         print("\nChoose an option:")
@@ -108,7 +174,8 @@ def main(book):
         print("3) List how many times every single word in the document appears.")
         print("4) List the most common words from rank 'a' to rank 'b'.")
         print("5) Count how many times a given word appears in the document.")
-        print("6) Exit")
+        print("6) Replace or remove a word in the document.")
+        print("7) Exit")
         choice = input("Please enter your choice:")
 
         if choice == "1":
@@ -141,6 +208,8 @@ def main(book):
             word = input("Enter the specific word:")
             count_specific_word(book, word)
         elif choice == "6":
+            book = replace_word(book)
+        elif choice == "7":
             print("Exiting, have a fantastic day!")
             break
         else:

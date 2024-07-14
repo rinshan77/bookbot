@@ -11,6 +11,8 @@ I decided to expand upon it and make it a simple, functional, clean program whic
 3) A list of every single word appearing in the string along with the count of their appearances throughout the string.
 4) A function expanding on the previous function, letting the user choose the range of the most common words to display, from rank #a to rank #b.
 5) A slightly useful function, counting the appearance of a given word and displaying the count.
+6) A function which lets the user enter two words, where every instance of the first word in the document will be replaced by the second word.
+Has a second function of simply removing the given word from the document. Lets the user save the modified document.
 
 I plan to use this code as a benchmark, for when I return after gaining more coding skill and knowledge, I want to be able to see how much I have grown.
 
