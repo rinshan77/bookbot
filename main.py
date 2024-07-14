@@ -55,7 +55,7 @@ def sort_dictionary(char_count):
 
 
 def word_count(book):
-    punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+    punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~“”"
     lowercase_book = book.lower()
     clean_words = []
     words = lowercase_book.split()
@@ -72,11 +72,19 @@ def word_count(book):
     return word_count
 
 
-def sort_words(word_count, start=0, end=None):
-    sorted_words = sorted(word_count.items(), key=lambda item: item[1], reverse=True)
+def sort_words(word_count, start=0, end=None, reverse_order=False):
+    sorted_words = sorted(word_count.items(), key=count_get, reverse=True)
     if end is None or end > len(sorted_words):
         end = len(sorted_words)
-    selected_words = sorted_words[start:end]
+
+    if reverse_order:
+        if start > 0:
+            selected_words = sorted_words[end - 1 : start - 1 : -1]
+        else:
+            selected_words = sorted_words[end - 1 :: -1]
+    else:
+        selected_words = sorted_words[start:end]
+
     print_count_table(selected_words, item_type="words")
 
 
@@ -123,9 +131,12 @@ def main(book):
                     ).split(),
                 )
                 words_count = word_count(book)
-                sort_words(words_count, start - 1, end)
+                if start > end:
+                    sort_words(words_count, end - 1, start, reverse_order=True)
+                else:
+                    sort_words(words_count, start - 1, end)
             except ValueError:
-                print("Invalid input. Please enter two integers separated by space.")
+                print("Invalid input. Please enter two integers separated by a space.")
         elif choice == "5":
             word = input("Enter the specific word:")
             count_specific_word(book, word)
