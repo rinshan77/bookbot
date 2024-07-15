@@ -226,12 +226,12 @@ def main(book):
             "2) Count how many times each letter of the alphabet appears in the document."
         )
         print("3) List how many times every single word in the document appears.")
-        print("3.1) Same as option 3 but group words that appear only once.")
-        print("4) List the most common words from rank 'a' to rank 'b'.")
-        print("5) Count how many times a given word appears in the document.")
-        print("6) Replace or remove a word in the document.")
-        print("7) Save the current working document.")
-        print("8) Exit")
+        print("4 Same as option 3 but group words that appear only once.")
+        print("5) List the most common words from rank 'a' to rank 'b'.")
+        print("6) Count how many times a given word appears in the document.")
+        print("7) Replace or remove a word in the document.")
+        print("8) Save the current working document.")
+        print("9) Exit")
         choice = input("Please enter your choice: ")
 
         if choice == "1":
@@ -247,10 +247,10 @@ def main(book):
         elif choice == "3":
             words_count = word_count(book)
             sort_words(words_count)
-        elif choice == "3.1":
+        elif choice == "4":
             words_count = word_count(book)
             sort_words(words_count, group_once=True)
-        elif choice == "4":
+        elif choice == "5":
             try:
                 start, end = map(
                     int,
@@ -265,17 +265,17 @@ def main(book):
                     sort_words(words_count, start - 1, end)
             except ValueError:
                 print("Invalid input. Please enter two integers separated by a space.")
-        elif choice == "5":
+        elif choice == "6":
             word = input("Enter the specific word:")
             word_count(book, word)
-        elif choice == "6":
-            book = replace_word(book)
         elif choice == "7":
+            book = replace_word(book)
+        elif choice == "8":
             save_filename = input("Enter the filename to save the document: ")
             with open(save_filename, "w") as file:
                 file.write(book)
             print(f"Document saved to {save_filename}.")
-        elif choice == "8":
+        elif choice == "9":
             print("Exiting, have a fantastic day!")
             break
         else:
