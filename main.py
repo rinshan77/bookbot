@@ -49,25 +49,24 @@ def count_chars(book):
     return dictionary
 
 
-def word_count(book):
+def word_count(book, specific_word=None):
     punctuation = string.punctuation + "“”"
     words = book.lower().split()
-    word_count = {}
+    word_dictionary = {}
 
     for word in words:
         clean_word = "".join(char for char in word if char not in punctuation)
         if clean_word:
-            word_count[clean_word] = word_count.get(clean_word, 0) + 1
-    return word_count
+            word_dictionary[clean_word] = word_dictionary.get(clean_word, 0) + 1
 
-def count_specific_word(book, word):
-    word = word.lower()
-    words = book.lower().split()
-    count = 0
-    for w in words:
-        if w == word:
-            count += 1
-    print(f"The word '{word}' appears {count} times.")
+    if specific_word:
+        specific_word_clean = "".join(
+            char for char in specific_word.lower() if char not in punctuation
+        )
+        count = word_dictionary.get(specific_word_clean, 0)
+        print(f"The word '{specific_word_clean}' appears {count} times.")
+    else:
+        return word_dictionary
 
 
 def sort_words(word_count, start=0, end=None, reverse_order=False, group_once=False):
@@ -90,7 +89,6 @@ def sort_words(word_count, start=0, end=None, reverse_order=False, group_once=Fa
             print(" | ".join([item[0] for item in words_once if item[0]]))
     else:
         print_count_table(selected_words, item_type="words")
-
 
 
 def clean_up_text(text):
@@ -116,8 +114,15 @@ def replacer(book, old_word, new_word, case_sensitive=True):
                 match = segment == old_word
             else:
                 match = segment.lower() == old_word.lower()
-            
-            if match and (i == 0 or not line[i - 1].isalpha()) and (i + len_old_word == len(line) or not line[i + len_old_word].isalpha()):
+
+            if (
+                match
+                and (i == 0 or not line[i - 1].isalpha())
+                and (
+                    i + len_old_word == len(line)
+                    or not line[i + len_old_word].isalpha()
+                )
+            ):
                 new_line.append(new_word)
                 i += len_old_word
             else:
@@ -128,10 +133,9 @@ def replacer(book, old_word, new_word, case_sensitive=True):
     return "\n".join(replaced_lines)
 
 
-
 def replace_word(book):
-    original_book = book
     modified_book = book
+
     while True:
         words = input(
             "Please enter the word you wish replaced in the document followed by the word you want it replaced with. \n"
@@ -144,67 +148,43 @@ def replace_word(book):
             )
             continue
 
+        if words[0].lower() == "quit":
+            print("Exiting replace word operation.")
+            return modified_book
+
         case_sensitive = (
             input("Should the replacement be case-sensitive? (yes or no): ")
             .strip()
             .lower()
+            == "yes"
         )
 
         if len(words) == 1:
             removal_word = words[0]
-            if removal_word.lower() == "quit":
-                print("Exiting replace word operation.")
-                return original_book
+            book_temp = replacer(modified_book, removal_word, "", case_sensitive)
 
-            if case_sensitive == "no":
-                book_temp = replacer(modified_book, removal_word, "", case_sensitive=False)
-                if removal_word.lower() in modified_book.lower():
-                    modified_book = clean_up_text(book_temp)
-                    print(
-                        f"'{removal_word}' removed from the document (case-insensitive)."
-                    )
-                else:
-                    print(f"'{removal_word}' was not found in the document. Try again.")
-                    continue
+            if (case_sensitive and removal_word in modified_book) or (
+                not case_sensitive and removal_word.lower() in modified_book.lower()
+            ):
+                modified_book = clean_up_text(book_temp)
+                sensitivity = "case-sensitive" if case_sensitive else "case-insensitive"
+                print(f"'{removal_word}' removed from the document ({sensitivity}).")
             else:
-                book_temp = replacer(modified_book, removal_word, "")
-                if removal_word in modified_book:
-                    modified_book = clean_up_text(book_temp)
-                    print(
-                        f"'{removal_word}' removed from the document (case-sensitive)."
-                    )
-                else:
-                    print(f"'{removal_word}' was not found in the document. Try again.")
-                    continue
+                print(f"'{removal_word}' was not found in the document. Try again.")
+                continue
+        else:
+            replace_word, with_word = words
+            book_temp = replacer(modified_book, replace_word, with_word, case_sensitive)
 
-        elif len(words) == 2:
-            replace_word = words[0]
-            with_word = words[1]
-
-            if case_sensitive == "no":
-                book_temp = replacer(
-                    modified_book, replace_word, with_word, case_sensitive=False
-                )
-                if replace_word.lower() in modified_book.lower():
-                    modified_book = book_temp
-                    print(
-                        f"'{replace_word}' replaced with '{with_word}' (case-insensitive)."
-                    )
-                else:
-                    print(f"'{replace_word}' was not found in the document. Try again.")
-                    continue
+            if (case_sensitive and replace_word in modified_book) or (
+                not case_sensitive and replace_word.lower() in modified_book.lower()
+            ):
+                modified_book = book_temp
+                sensitivity = "case-sensitive" if case_sensitive else "case-insensitive"
+                print(f"'{replace_word}' replaced with '{with_word}' ({sensitivity}).")
             else:
-                book_temp = replacer(
-                    modified_book, replace_word, with_word
-                )
-                if replace_word in modified_book:
-                    modified_book = book_temp
-                    print(
-                        f"'{replace_word}' replaced with '{with_word}' (case-sensitive)."
-                    )
-                else:
-                    print(f"'{replace_word}' was not found in the document. Try again.")
-                    continue
+                print(f"'{replace_word}' was not found in the document. Try again.")
+                continue
 
         print("\n --- Start of the modified document --- \n")
         print(modified_book)
@@ -217,14 +197,20 @@ def replace_word(book):
         )
         if save_decision == "yes":
             save_file(modified_book)
-            original_book = modified_book
             print("Changes saved to working document.")
         else:
             print("Changes not saved to working document.")
-            save_file(modified_book)
-            
 
-        return original_book
+        # Ask if user wishes to continue modifying the document
+        continue_modification = (
+            input("Do you wish to modify other words in the document? (yes/no): ")
+            .strip()
+            .lower()
+        )
+        if continue_modification == "no":
+            return modified_book
+        else:
+            print("Continuing to modify the document.")
 
 
 def print_count_table(sorted_items, columns=10, item_type="letters"):
@@ -285,7 +271,7 @@ def main(book):
                 print("Invalid input. Please enter two integers separated by a space.")
         elif choice == "5":
             word = input("Enter the specific word:")
-            count_specific_word(book, word)
+            word_count(book, word)
         elif choice == "6":
             book = replace_word(book)
         elif choice == "7":
