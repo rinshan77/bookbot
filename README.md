@@ -14,6 +14,7 @@ I decided to expand upon it and make it a simple, functional, clean program whic
 5) A slightly useful function, counting the appearance of a given word and displaying the count.
 6) A function which lets the user enter two words, where every instance of the first word in the document will be replaced by the second word.
 Has a second function of simply removing the given word from the document. Lets the user save the modified document, otherwise keep on working on the original document.
+7) An option to save the current working document. The user can play around with the working document by replacing or removing words, choose not to save at that given moment, but then review the whole document with 1) and save it with 7)
 
 I plan to use this code as a benchmark, for when I return after gaining more coding skill and knowledge, I want to be able to see how much I have grown.
 
