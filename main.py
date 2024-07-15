@@ -3,21 +3,24 @@ import string
 
 
 def read_file(filepath):
-    try:
-        with open(filepath, "r", encoding="utf-8") as path:
-            return path.read()
-    except FileNotFoundError:
-        print(f"Error: The file '{filepath}' was not found.")
-        sys.exit(1)
-    except PermissionError:
-        print(f"Error: Permission denied to access the file '{filepath}'.")
-        sys.exit(2)
-    except IOError as e:
-        print(f"An I/O error occurred while reading the file: {e}")
-        sys.exit(3)
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        sys.exit(4)
+    while True:
+        try:
+            with open(filepath, "r", encoding="utf-8") as file:
+                return file.read()
+        except FileNotFoundError:
+            print(f"Error: The file '{filepath}' was not found.")
+        except PermissionError:
+            print(f"Error: Permission denied to access the file '{filepath}'.")
+        except IOError as e:
+            print(f"An I/O error occurred while reading the file: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+        filepath = input(
+            "Please enter a valid path to the text file or type 'quit' to exit: "
+        ).strip()
+        if filepath.lower() == "quit":
+            print("Exiting program.")
+            sys.exit(0)
 
 
 def save_file(modified_book):
@@ -36,6 +39,9 @@ def save_file(modified_book):
             print(f"Document successfully saved to {path}!")
         except IOError as e:
             print(f"An error occurred while saving the document: {e}")
+            retry = input("Do you want to try saving again? (yes/no): ").strip().lower()
+            if retry == "yes":
+                save_file(modified_book)
     else:
         print("The modified document was not saved.")
 
@@ -275,7 +281,7 @@ def main(book):
             with open(save_filename, "w") as file:
                 file.write(book)
             print(f"Document saved to {save_filename}.")
-        elif choice == "9":
+        elif choice == "9" or "exit" or "quit":
             print("Exiting, have a fantastic day!")
             break
         else:
@@ -286,7 +292,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         filepath = sys.argv[1]
     if len(sys.argv) == 1:
-        filepath = input("Please enter the path to the text file: ")
+        filepath = input(
+            "Welcome to BookBot v1.5!\nPlease enter the path to the text file: "
+        )
     book = read_file(filepath)
     if book:
         main(book)
