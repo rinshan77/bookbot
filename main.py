@@ -281,7 +281,7 @@ def main(book):
             with open(save_filename, "w") as file:
                 file.write(book)
             print(f"Document saved to {save_filename}.")
-        elif choice == "9" or "exit" or "quit":
+        elif choice in ["9", "exit", "quit"]:
             print("Exiting, have a fantastic day!")
             break
         else:
