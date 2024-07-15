@@ -82,13 +82,13 @@ def sort_words(word_count, start=0, end=None, reverse_order=False, group_once=Fa
     if group_once:
         words_once = [item for item in sorted_words if item[1] == 1]
         selected_words = [item for item in selected_words if item[1] != 1]
-        print_count_table(selected_words, item_type="words")
+        print_count_table(selected_words, 5)
 
         if words_once:
             print(f"\nWords which appear once: {len(words_once)} words")
             print(" | ".join([item[0] for item in words_once if item[0]]))
     else:
-        print_count_table(selected_words, item_type="words")
+        print_count_table(selected_words, 5)
 
 
 def clean_up_text(text):
@@ -212,13 +212,10 @@ def replace_word(book):
             print("Continuing to modify the document.")
 
 
-def print_count_table(sorted_items, columns=10, item_type="letters"):
+def print_count_table(sorted_items, n=5, columns=10):
     for i in range(0, len(sorted_items), columns):
         row_items = sorted_items[i : i + columns]
-        if item_type == "letters":
-            print(" | ".join([f"'{item}': {count:5}" for item, count in row_items]))
-        elif item_type == "words":
-            print(" | ".join([f"'{item}': {count}" for item, count in row_items]))
+        print(" | ".join([f"'{item}': {count:n}" for item, count in row_items]))
 
 
 def main(book):
