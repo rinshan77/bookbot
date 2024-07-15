@@ -4,7 +4,10 @@ import re
 
 
 def read_file(filepath):
-    while True:
+    max_retries = 5
+    attempts = 0
+
+    while attempts < max_retries:
         try:
             with open(filepath, "r", encoding="utf-8") as file:
                 return file.read()
@@ -16,12 +19,21 @@ def read_file(filepath):
             print(f"An I/O error occurred while reading the file: {e}")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-        filepath = input(
-            "Please enter a valid path to the text file or type 'quit' to exit: "
-        ).strip().lower()
-        if filepath in ["quit", "exit", "stop", "end", "leave"] :
-            print("Exiting program.")
-            sys.exit(0)
+
+        attempts += 1
+        if attempts < max_retries:
+            filepath = (
+                input(
+                    "Please enter a valid path to the text file or type 'quit' to exit: "
+                )
+                .strip()
+                .lower()
+            )
+            if filepath in ["quit", "exit", "stop", "end", "leave"]:
+                print("Exiting program.")
+                sys.exit(0)
+    print(f"Failed to read file after {max_retries} attempts. Exiting.")
+    sys.exit(1)
 
 
 def save_file(modified_book):
@@ -99,8 +111,8 @@ def sort_words(word_count, start=0, end=None, reverse_order=False, group_once=Fa
 
 
 def clean_up_text(text):
-    text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'([.!?])\s+', r'\1', text)
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"([.!?])\s+", r"\1", text)
     return text
 
 
@@ -221,6 +233,7 @@ def print_count_table(sorted_items, n=5, columns=10):
         row_items = sorted_items[i : i + columns]
         print(" | ".join([f"'{item}': {count:n}" for item, count in row_items]))
 
+
 def menu():
     print("\nChoose an option:")
     print("1) Print the entire document on screen.")
@@ -236,57 +249,64 @@ def menu():
     print("9) Exit")
 
 
+def handle_choice(choice, book):
+    if choice == "1":
+        print(
+            f"\n --- Start of the document --- \n {book}\n--- End of the document ---"
+        )
+    elif choice == "2":
+        char_count = count_chars(book)
+        sorted_chars = sorted(
+            char_count.items(), key=lambda item: item[1], reverse=True
+        )
+        print_count_table(sorted_chars)
+    elif choice == "3":
+        words_count = word_count(book)
+        sort_words(words_count)
+    elif choice == "4":
+        words_count = word_count(book)
+        sort_words(words_count, group_once=True)
+    elif choice == "5":
+        try:
+            start, end = map(
+                int,
+                input(
+                    "Enter the starting and ending ranks separated by space (e.g. 100 150): "
+                ).split(),
+            )
+            words_count = word_count(book)
+            if start > end:
+                sort_words(words_count, end - 1, start, reverse_order=True)
+            else:
+                sort_words(words_count, start - 1, end)
+        except ValueError:
+            print("Invalid input. Please enter two integers separated by a space.")
+    elif choice == "6":
+        word = input("Enter the specific word:")
+        word_count(book, word)
+    elif choice == "7":
+        book = replace_word(book)
+    elif choice == "8":
+        save_filename = input("Enter the filename to save the document: ")
+        with open(save_filename, "w") as file:
+            file.write(book)
+        print(f"Document saved to {save_filename}.")
+    elif choice in ["9", "exit", "quit", "end", "leave", "stop"]:
+        print("Exiting, have a fantastic day!")
+        return None
+    else:
+        print("That's not an option, try again")
+
+    return book
+
+
 def main(book):
     while True:
         menu()
         choice = input("Please enter your choice: ")
-
-        if choice == "1":
-            print(
-                f"\n --- Start of the document --- \n {book}\n--- End of the document ---"
-            )
-        elif choice == "2":
-            char_count = count_chars(book)
-            sorted_chars = sorted(
-                char_count.items(), key=lambda item: item[1], reverse=True
-            )
-            print_count_table(sorted_chars)
-        elif choice == "3":
-            words_count = word_count(book)
-            sort_words(words_count)
-        elif choice == "4":
-            words_count = word_count(book)
-            sort_words(words_count, group_once=True)
-        elif choice == "5":
-            try:
-                start, end = map(
-                    int,
-                    input(
-                        "Enter the starting and ending ranks separated by space (e.g. 100 150): "
-                    ).split(),
-                )
-                words_count = word_count(book)
-                if start > end:
-                    sort_words(words_count, end - 1, start, reverse_order=True)
-                else:
-                    sort_words(words_count, start - 1, end)
-            except ValueError:
-                print("Invalid input. Please enter two integers separated by a space.")
-        elif choice == "6":
-            word = input("Enter the specific word:")
-            word_count(book, word)
-        elif choice == "7":
-            book = replace_word(book)
-        elif choice == "8":
-            save_filename = input("Enter the filename to save the document: ")
-            with open(save_filename, "w") as file:
-                file.write(book)
-            print(f"Document saved to {save_filename}.")
-        elif choice in ["9", "exit", "quit", "end", "leave", "stop"]:
-            print("Exiting, have a fantastic day!")
-            break
-        else:
-            print("That's not an option, try again")
+        book = handle_choice(choice, book)
+        if book is None:
+            sys.exit(0)
 
 
 if __name__ == "__main__":
