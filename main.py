@@ -201,7 +201,6 @@ def replace_word(book):
         else:
             print("Changes not saved to working document.")
 
-        # Ask if user wishes to continue modifying the document
         continue_modification = (
             input("Do you wish to modify other words in the document? (yes/no): ")
             .strip()
