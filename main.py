@@ -20,6 +20,26 @@ def read_file(filepath):
         sys.exit(4)
 
 
+def save_file(modified_book):
+    save = (
+        input("Would you like to save the modified document as a new file? (yes/no): ")
+        .strip()
+        .lower()
+    )
+    if save == "yes":
+        path = input(
+            "Enter the path and filename to save the document (e.g. /path/to/document.txt): "
+        ).strip()
+        try:
+            with open(path, "w", encoding="utf-8") as file:
+                file.write(modified_book)
+            print(f"Document successfully saved to {path}!")
+        except IOError as e:
+            print(f"An error occurred while saving the document: {e}")
+    else:
+        print("The modified document was not saved.")
+
+
 def count_chars(book):
     lowercase_book = book.lower()
     dictionary = {char: 0 for char in string.ascii_lowercase}
@@ -27,16 +47,6 @@ def count_chars(book):
         if letter in dictionary:
             dictionary[letter] += 1
     return dictionary
-
-
-def print_count_table(sorted_items, columns=10, item_type="letters"):
-    for i in range(0, len(sorted_items), columns):
-        row_items = sorted_items[i:i+columns]
-        if item_type == "letters":
-            print(" | ".join([f"'{item}': {count:5}" for item, count in row_items]))
-        elif item_type == "words":
-            print(" | ".join([f"'{item}': {count}" for item, count in row_items]))
-
 
 
 def word_count(book):
@@ -238,24 +248,13 @@ def replace_word(book):
         return original_book
 
 
-def save_file(modified_book):
-    save = (
-        input("Would you like to save the modified document as a new file? (yes/no): ")
-        .strip()
-        .lower()
-    )
-    if save == "yes":
-        path = input(
-            "Enter the path and filename to save the document (e.g. /path/to/document.txt): "
-        ).strip()
-        try:
-            with open(path, "w", encoding="utf-8") as file:
-                file.write(modified_book)
-            print(f"Document successfully saved to {path}!")
-        except IOError as e:
-            print(f"An error occurred while saving the document: {e}")
-    else:
-        print("The modified document was not saved.")
+def print_count_table(sorted_items, columns=10, item_type="letters"):
+    for i in range(0, len(sorted_items), columns):
+        row_items = sorted_items[i : i + columns]
+        if item_type == "letters":
+            print(" | ".join([f"'{item}': {count:5}" for item, count in row_items]))
+        elif item_type == "words":
+            print(" | ".join([f"'{item}': {count}" for item, count in row_items]))
 
 
 def main(book):
@@ -312,7 +311,7 @@ def main(book):
             book = replace_word(book)
         elif choice == "7":
             save_filename = input("Enter the filename to save the document: ")
-            with open(save_filename, 'w') as file:
+            with open(save_filename, "w") as file:
                 file.write(book)
             print(f"Document saved to {save_filename}.")
         elif choice == "8":
