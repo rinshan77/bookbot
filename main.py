@@ -226,7 +226,7 @@ def main(book):
             "2) Count how many times each letter of the alphabet appears in the document."
         )
         print("3) List how many times every single word in the document appears.")
-        print("4 Same as option 3 but group words that appear only once.")
+        print("4) Same as option 3 but group words that appear only once.")
         print("5) List the most common words from rank 'a' to rank 'b'.")
         print("6) Count how many times a given word appears in the document.")
         print("7) Replace or remove a word in the document.")
