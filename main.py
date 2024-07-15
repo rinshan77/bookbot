@@ -60,6 +60,15 @@ def word_count(book):
             word_count[clean_word] = word_count.get(clean_word, 0) + 1
     return word_count
 
+def count_specific_word(book, word):
+    word = word.lower()
+    words = book.lower().split()
+    count = 0
+    for w in words:
+        if w == word:
+            count += 1
+    print(f"The word '{word}' appears {count} times.")
+
 
 def sort_words(word_count, start=0, end=None, reverse_order=False, group_once=False):
     sorted_words = sorted(word_count.items(), key=lambda item: item[1], reverse=True)
@@ -83,15 +92,6 @@ def sort_words(word_count, start=0, end=None, reverse_order=False, group_once=Fa
         print_count_table(selected_words, item_type="words")
 
 
-def count_specific_word(book, word):
-    word = word.lower()
-    words = book.lower().split()
-    count = 0
-    for w in words:
-        if w == word:
-            count += 1
-    print(f"The word '{word}' appears {count} times.")
-
 
 def clean_up_text(text):
     while "  " in text:
@@ -102,44 +102,22 @@ def clean_up_text(text):
     return text
 
 
-def replace_case_insensitive(book, old_word, new_word):
-    words = []
-    current_word = []
-    i = 0
-    len_old_word = len(old_word)
-
-    while i < len(book):
-        if (
-            book[i : i + len_old_word].lower() == old_word.lower()
-            and (i + len_old_word == len(book) or not book[i + len_old_word].isalpha())
-            and (i == 0 or not book[i - 1].isalpha())
-        ):
-            words.append(new_word)
-            i += len_old_word
-        else:
-            words.append(book[i])
-            i += 1
-
-    return "".join(words)
-
-
-def replace_case_sensitive(book, old_word, new_word):
+def replacer(book, old_word, new_word, case_sensitive=True):
     lines = book.split("\n")
     replaced_lines = []
-
     len_old_word = len(old_word)
+
     for line in lines:
         new_line = []
         i = 0
         while i < len(line):
-            if (
-                line[i : i + len_old_word] == old_word
-                and (i == 0 or not line[i - 1].isalpha())
-                and (
-                    i + len_old_word == len(line)
-                    or not line[i + len_old_word].isalpha()
-                )
-            ):
+            segment = line[i : i + len_old_word]
+            if case_sensitive:
+                match = segment == old_word
+            else:
+                match = segment.lower() == old_word.lower()
+            
+            if match and (i == 0 or not line[i - 1].isalpha()) and (i + len_old_word == len(line) or not line[i + len_old_word].isalpha()):
                 new_line.append(new_word)
                 i += len_old_word
             else:
@@ -148,6 +126,7 @@ def replace_case_sensitive(book, old_word, new_word):
         replaced_lines.append("".join(new_line))
 
     return "\n".join(replaced_lines)
+
 
 
 def replace_word(book):
@@ -178,7 +157,7 @@ def replace_word(book):
                 return original_book
 
             if case_sensitive == "no":
-                book_temp = replace_case_insensitive(modified_book, removal_word, "")
+                book_temp = replacer(modified_book, removal_word, "", case_sensitive=False)
                 if removal_word.lower() in modified_book.lower():
                     modified_book = clean_up_text(book_temp)
                     print(
@@ -188,7 +167,7 @@ def replace_word(book):
                     print(f"'{removal_word}' was not found in the document. Try again.")
                     continue
             else:
-                book_temp = replace_case_sensitive(modified_book, removal_word, "")
+                book_temp = replacer(modified_book, removal_word, "")
                 if removal_word in modified_book:
                     modified_book = clean_up_text(book_temp)
                     print(
@@ -203,8 +182,8 @@ def replace_word(book):
             with_word = words[1]
 
             if case_sensitive == "no":
-                book_temp = replace_case_insensitive(
-                    modified_book, replace_word, with_word
+                book_temp = replacer(
+                    modified_book, replace_word, with_word, case_sensitive=False
                 )
                 if replace_word.lower() in modified_book.lower():
                     modified_book = book_temp
@@ -215,7 +194,7 @@ def replace_word(book):
                     print(f"'{replace_word}' was not found in the document. Try again.")
                     continue
             else:
-                book_temp = replace_case_sensitive(
+                book_temp = replacer(
                     modified_book, replace_word, with_word
                 )
                 if replace_word in modified_book:
@@ -239,11 +218,11 @@ def replace_word(book):
         if save_decision == "yes":
             save_file(modified_book)
             original_book = modified_book
-            working_book = modified_book
-            print("Changes saved.")
+            print("Changes saved to working document.")
         else:
+            print("Changes not saved to working document.")
             save_file(modified_book)
-            print("Changes not saved.")
+            
 
         return original_book
 
