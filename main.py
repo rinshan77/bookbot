@@ -1,5 +1,6 @@
 import sys
 import string
+import re
 
 
 def read_file(filepath):
@@ -17,8 +18,8 @@ def read_file(filepath):
             print(f"An unexpected error occurred: {e}")
         filepath = input(
             "Please enter a valid path to the text file or type 'quit' to exit: "
-        ).strip()
-        if filepath.lower() in ["quit", "exit", "stop", "end", "leave"] :
+        ).strip().lower()
+        if filepath in ["quit", "exit", "stop", "end", "leave"] :
             print("Exiting program.")
             sys.exit(0)
 
@@ -98,11 +99,8 @@ def sort_words(word_count, start=0, end=None, reverse_order=False, group_once=Fa
 
 
 def clean_up_text(text):
-    while "  " in text:
-        text = text.replace("  ", " ")
-    punctuations = [".", "!", "?", "\n"]
-    for p in punctuations:
-        text = text.replace(p + " ", p + "")
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'([.!?])\s+', r'\1', text)
     return text
 
 
@@ -223,21 +221,24 @@ def print_count_table(sorted_items, n=5, columns=10):
         row_items = sorted_items[i : i + columns]
         print(" | ".join([f"'{item}': {count:n}" for item, count in row_items]))
 
+def menu():
+    print("\nChoose an option:")
+    print("1) Print the entire document on screen.")
+    print(
+        "2) Count how many times each letter of the alphabet appears in the document."
+    )
+    print("3) List how many times every single word in the document appears.")
+    print("4) Same as option 3 but group words that appear only once.")
+    print("5) List the most common words from rank 'a' to rank 'b'.")
+    print("6) Count how many times a given word appears in the document.")
+    print("7) Replace or remove a word in the document.")
+    print("8) Save the current working document.")
+    print("9) Exit")
+
 
 def main(book):
     while True:
-        print("\nChoose an option:")
-        print("1) Print the entire document on screen.")
-        print(
-            "2) Count how many times each letter of the alphabet appears in the document."
-        )
-        print("3) List how many times every single word in the document appears.")
-        print("4) Same as option 3 but group words that appear only once.")
-        print("5) List the most common words from rank 'a' to rank 'b'.")
-        print("6) Count how many times a given word appears in the document.")
-        print("7) Replace or remove a word in the document.")
-        print("8) Save the current working document.")
-        print("9) Exit")
+        menu()
         choice = input("Please enter your choice: ")
 
         if choice == "1":
