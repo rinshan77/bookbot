@@ -18,7 +18,7 @@ def read_file(filepath):
         filepath = input(
             "Please enter a valid path to the text file or type 'quit' to exit: "
         ).strip()
-        if filepath.lower() == "quit":
+        if filepath.lower() in ["quit", "exit", "stop", "end", "leave"] :
             print("Exiting program.")
             sys.exit(0)
 
@@ -281,7 +281,7 @@ def main(book):
             with open(save_filename, "w") as file:
                 file.write(book)
             print(f"Document saved to {save_filename}.")
-        elif choice in ["9", "exit", "quit"]:
+        elif choice in ["9", "exit", "quit", "end", "leave", "stop"]:
             print("Exiting, have a fantastic day!")
             break
         else:
