@@ -7,16 +7,16 @@ def read_file(filepath):
             return path.read()
     except FileNotFoundError:
         print(f"Error: The file '{filepath}' was not found.")
-        return ""
+        exit(1)
     except PermissionError:
         print(f"Error: Permission denied to access the file '{filepath}'.")
-        return ""
+        exit(2)
     except IOError as e:
         print(f"An I/O error occurred while reading the file: {e}")
-        return ""
+        exit(3)
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-        return ""
+        exit(4)
 
 
 def count_words(book):
