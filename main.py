@@ -1,8 +1,6 @@
 import sys
 import string
 
-working_book = ""
-
 
 def read_file(filepath):
     try:
@@ -10,23 +8,21 @@ def read_file(filepath):
             return path.read()
     except FileNotFoundError:
         print(f"Error: The file '{filepath}' was not found.")
-        exit(1)
+        sys.exit(1)
     except PermissionError:
         print(f"Error: Permission denied to access the file '{filepath}'.")
-        exit(2)
+        sys.exit(2)
     except IOError as e:
         print(f"An I/O error occurred while reading the file: {e}")
-        exit(3)
+        sys.exit(3)
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-        exit(4)
+        sys.exit(4)
 
 
 def count_chars(book):
     lowercase_book = book.lower()
-    dictionary = {}
-    for i in string.ascii_lowercase:
-        dictionary[i] = 0
+    dictionary = {char: 0 for char in string.ascii_lowercase}
     for letter in lowercase_book:
         if letter in dictionary:
             dictionary[letter] += 1
@@ -35,30 +31,23 @@ def count_chars(book):
 
 def print_count_table(sorted_items, columns=10, item_type="letters"):
     for i in range(0, len(sorted_items), columns):
-        row_items = sorted_items[i : i + columns]
+        row_items = sorted_items[i:i+columns]
         if item_type == "letters":
-            print(
-                " | ".join([f"{item}: {count:5}" for item, count in row_items if item])
-            )
+            print(" | ".join([f"'{item}': {count:5}" for item, count in row_items]))
         elif item_type == "words":
-            print(" | ".join([f"{item}: {count}" for item, count in row_items if item]))
+            print(" | ".join([f"'{item}': {count}" for item, count in row_items]))
+
 
 
 def word_count(book):
     punctuation = string.punctuation + "“”"
-    lowercase_book = book.lower()
-    clean_words = []
-    words = lowercase_book.split()
+    words = book.lower().split()
     word_count = {}
+
     for word in words:
         clean_word = "".join(char for char in word if char not in punctuation)
         if clean_word:
-            clean_words.append(clean_word)
-    for word in clean_words:
-        if word in word_count:
-            word_count[word] += 1
-        else:
-            word_count[word] = 1
+            word_count[clean_word] = word_count.get(clean_word, 0) + 1
     return word_count
 
 
@@ -322,7 +311,10 @@ def main(book):
         elif choice == "6":
             book = replace_word(book)
         elif choice == "7":
-            save_file(working_book)
+            save_filename = input("Enter the filename to save the document: ")
+            with open(save_filename, 'w') as file:
+                file.write(book)
+            print(f"Document saved to {save_filename}.")
         elif choice == "8":
             print("Exiting, have a fantastic day!")
             break
