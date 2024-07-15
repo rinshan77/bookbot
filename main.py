@@ -1,4 +1,7 @@
 import sys
+import string
+
+working_book = ""
 
 
 def read_file(filepath):
@@ -19,14 +22,10 @@ def read_file(filepath):
         exit(4)
 
 
-def count_words(book):
-    return len(book.split())
-
-
 def count_chars(book):
     lowercase_book = book.lower()
     dictionary = {}
-    for i in "abcdefghijklmnopqrstuvwxyz":
+    for i in string.ascii_lowercase:
         dictionary[i] = 0
     for letter in lowercase_book:
         if letter in dictionary:
@@ -45,17 +44,8 @@ def print_count_table(sorted_items, columns=10, item_type="letters"):
             print(" | ".join([f"{item}: {count}" for item, count in row_items if item]))
 
 
-def count_get(item):
-    return item[1]
-
-
-def sort_dictionary(char_count):
-    sorted_char_list = sorted(char_count.items(), key=count_get, reverse=True)
-    return sorted_char_list
-
-
 def word_count(book):
-    punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~“”"
+    punctuation = string.punctuation + "“”"
     lowercase_book = book.lower()
     clean_words = []
     words = lowercase_book.split()
@@ -73,7 +63,7 @@ def word_count(book):
 
 
 def sort_words(word_count, start=0, end=None, reverse_order=False, group_once=False):
-    sorted_words = sorted(word_count.items(), key=count_get, reverse=True)
+    sorted_words = sorted(word_count.items(), key=lambda item: item[1], reverse=True)
     if end is None or end > len(sorted_words):
         end = len(sorted_words)
 
@@ -134,17 +124,6 @@ def replace_case_insensitive(book, old_word, new_word):
     return "".join(words)
 
 
-def remove_word_case_insensitive(book, word):
-    return replace_case_insensitive(book, word, "")
-
-
-def replace_with_case_sensitivity(text, old_word, new_word, case_sensitive):
-    if case_sensitive:
-        return replace_word(text, old_word, new_word, case_sensitive=True)
-    else:
-        return replace_word(text, old_word, new_word, case_sensitive=False)
-
-
 def replace_case_sensitive(book, old_word, new_word):
     lines = book.split("\n")
     replaced_lines = []
@@ -200,7 +179,7 @@ def replace_word(book):
                 return original_book
 
             if case_sensitive == "no":
-                book_temp = remove_word_case_insensitive(modified_book, removal_word)
+                book_temp = replace_case_insensitive(modified_book, removal_word, "")
                 if removal_word.lower() in modified_book.lower():
                     modified_book = clean_up_text(book_temp)
                     print(
@@ -254,13 +233,17 @@ def replace_word(book):
         print("\n --- End of the modified document --- \n")
 
         save_decision = (
-            input("Do you want to save the changes? (yes or no): ").strip().lower()
+            input("Do you want to save the changes to the working document? (yes/no): ")
+            .strip()
+            .lower()
         )
         if save_decision == "yes":
             save_file(modified_book)
             original_book = modified_book
+            working_book = modified_book
             print("Changes saved.")
         else:
+            save_file(modified_book)
             print("Changes not saved.")
 
         return original_book
@@ -268,7 +251,7 @@ def replace_word(book):
 
 def save_file(modified_book):
     save = (
-        input("Would you like to save the modified document? (yes/no): ")
+        input("Would you like to save the modified document as a new file? (yes/no): ")
         .strip()
         .lower()
     )
@@ -298,7 +281,8 @@ def main(book):
         print("4) List the most common words from rank 'a' to rank 'b'.")
         print("5) Count how many times a given word appears in the document.")
         print("6) Replace or remove a word in the document.")
-        print("7) Exit")
+        print("7) Save the current working document.")
+        print("8) Exit")
         choice = input("Please enter your choice: ")
 
         if choice == "1":
@@ -307,7 +291,9 @@ def main(book):
             )
         elif choice == "2":
             char_count = count_chars(book)
-            sorted_chars = sort_dictionary(char_count)
+            sorted_chars = sorted(
+                char_count.items(), key=lambda item: item[1], reverse=True
+            )
             print_count_table(sorted_chars)
         elif choice == "3":
             words_count = word_count(book)
@@ -336,6 +322,8 @@ def main(book):
         elif choice == "6":
             book = replace_word(book)
         elif choice == "7":
+            save_file(working_book)
+        elif choice == "8":
             print("Exiting, have a fantastic day!")
             break
         else:
