@@ -37,26 +37,48 @@ def read_file(filepath):
 
 
 def save_file(modified_book):
-    save = (
-        input("Would you like to save the modified document as a new file? (yes/no): ")
-        .strip()
-        .lower()
-    )
-    if save == "yes":
+    invalid_chars = '<>:"/\\|?*'
+    cancel_keywords = ["quit", "exit", "stop", "end", "leave"]
+
+    while True:
         path = input(
             "Enter the path and filename to save the document (e.g. /path/to/document.txt): "
         ).strip()
-        try:
-            with open(path, "w", encoding="utf-8") as file:
-                file.write(modified_book)
-            print(f"Document successfully saved to {path}!")
-        except IOError as e:
-            print(f"An error occurred while saving the document: {e}")
-            retry = input("Do you want to try saving again? (yes/no): ").strip().lower()
-            if retry == "yes":
-                save_file(modified_book)
-    else:
-        print("The modified document was not saved.")
+
+        if any(char in invalid_chars for char in path):
+            print('Invalid filename. Please avoid using characters like <>:"/\\|?*.')
+            continue
+
+        if any(keyword in path.lower() for keyword in cancel_keywords):
+            print("Save operation canceled.")
+            return
+
+        if not path:
+            print("Invalid filename. Please ensure the filename is not empty.")
+            continue
+
+        confirm = (
+            input(f"Are you sure you want to save the file to {path}? yes/no: ")
+            .strip()
+            .lower()
+        )
+        if confirm == "yes":
+            try:
+                with open(path, "w", encoding="utf-8") as file:
+                    file.write(modified_book)
+                print(f"Document successfully saved to {path}.")
+                return
+            except IOError as e:
+                print(f"An error occurred while saving the file: {e}")
+                retry = (
+                    input("Do you want to try saving again? (yes/no): ").strip().lower()
+                )
+                if retry != "yes":
+                    print("Save operation canceled.")
+                    break
+        else:
+            print("Save operation canceled.")
+            break
 
 
 def count_chars(book):
@@ -212,8 +234,7 @@ def replace_word(book):
             .lower()
         )
         if save_decision == "yes":
-            save_file(modified_book)
-            print("Changes saved to working document.")
+            return modified_book
         else:
             print("Changes not saved to working document.")
 
@@ -233,11 +254,6 @@ def print_count_table(sorted_items, n=5, columns=10):
         row_items = sorted_items[i : i + columns]
         print(" | ".join([f"'{item}': {count:n}" for item, count in row_items]))
 
-def is_valid_filename(filename):
-    if not filename:
-        return False
-    invalid_chars = '<>:"/\\|?*'
-    return not any(char in invalid_chars for char in filename)
 
 def menu():
     print("\nChoose an option:")
@@ -292,22 +308,15 @@ def handle_choice(choice, book):
     elif choice == "7":
         book = replace_word(book)
     elif choice == "8":
-        while True:
-            save_filename = input("Enter the filename to save the document: ")
-            if is_valid_filename(save_filename):
-                confirm = input(f"Are you sure you want to save the file to {save_filename}? yes/no: ").strip().lower()
-                if confirm == 'yes':
-                    try:
-                        with open(save_filename, "w") as file:
-                            file.write(book)
-                        print(f"Document saved to {save_filename}.")
-                    except IOError as e:
-                        print(f"An error occurred while saving the file: {e}")
-                else:
-                    print("Save operation canceled.")
-                break
-            else:
-                print("Invalid filename. Please avoid using characters like <>:\"/\\|?* and ensure the filename is not empty.")
+        save_decision = (
+            input("Do you want to save the current working document? (yes/no): ")
+            .strip()
+            .lower()
+        )
+        if save_decision == "yes":
+            save_file(book)
+        else:
+            print("Changes not saved to working document.")
     elif choice in ["9", "exit", "quit", "end", "leave", "stop"]:
         print("Exiting, have a fantastic day!")
         return None
