@@ -233,6 +233,11 @@ def print_count_table(sorted_items, n=5, columns=10):
         row_items = sorted_items[i : i + columns]
         print(" | ".join([f"'{item}': {count:n}" for item, count in row_items]))
 
+def is_valid_filename(filename):
+    if not filename:
+        return False
+    invalid_chars = '<>:"/\\|?*'
+    return not any(char in invalid_chars for char in filename)
 
 def menu():
     print("\nChoose an option:")
@@ -287,10 +292,22 @@ def handle_choice(choice, book):
     elif choice == "7":
         book = replace_word(book)
     elif choice == "8":
-        save_filename = input("Enter the filename to save the document: ")
-        with open(save_filename, "w") as file:
-            file.write(book)
-        print(f"Document saved to {save_filename}.")
+        while True:
+            save_filename = input("Enter the filename to save the document: ")
+            if is_valid_filename(save_filename):
+                confirm = input(f"Are you sure you want to save the file to {save_filename}? yes/no: ").strip().lower()
+                if confirm == 'yes':
+                    try:
+                        with open(save_filename, "w") as file:
+                            file.write(book)
+                        print(f"Document saved to {save_filename}.")
+                    except IOError as e:
+                        print(f"An error occurred while saving the file: {e}")
+                else:
+                    print("Save operation canceled.")
+                break
+            else:
+                print("Invalid filename. Please avoid using characters like <>:\"/\\|?* and ensure the filename is not empty.")
     elif choice in ["9", "exit", "quit", "end", "leave", "stop"]:
         print("Exiting, have a fantastic day!")
         return None
